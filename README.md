@@ -22,26 +22,22 @@ Installation
 Clone the repository:
 
 bash
-Copy
-Edit
+
 git clone https://github.com/yourusername/secure-data-encryption-system.git
 Navigate to the project directory:
 
 bash
-Copy
-Edit
+
 cd secure-data-encryption-system
 Install the required dependencies:
 
 bash
-Copy
-Edit
+
 pip install -r requirements.txt
 Run the Streamlit app:
 
 bash
-Copy
-Edit
+
 streamlit run app.py
 Usage
 Store Data: Navigate to the "Store Data" page, enter data and a passkey, and store the data securely.
