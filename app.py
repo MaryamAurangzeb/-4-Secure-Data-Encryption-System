@@ -2,12 +2,12 @@ import streamlit as st
 import hashlib
 from cryptography.fernet import Fernet
 
-# Generate a key (this should be stored securely in production)
+# Generate a key (in production, store this securely)
 KEY = Fernet.generate_key()
 cipher = Fernet(KEY)
 
 # In-memory data storage
-stored_data = {}  # {"user1_data": {"encrypted_text": "xyz", "passkey": "hashed"}}
+stored_data = {}  # {"encrypted_text": {"encrypted_text": "xyz", "passkey": "hashed"}}
 failed_attempts = 0
 
 # Function to hash passkey
@@ -20,14 +20,14 @@ def encrypt_data(text, passkey):
 
 # Function to decrypt data
 def decrypt_data(encrypted_text, passkey):
-    global failed_attempts
+    global failed_attempts  # ✅ FIXED: Declare before modifying
     hashed_passkey = hash_passkey(passkey)
 
     for key, value in stored_data.items():
         if value["encrypted_text"] == encrypted_text and value["passkey"] == hashed_passkey:
             failed_attempts = 0
             return cipher.decrypt(encrypted_text.encode()).decode()
-    
+
     failed_attempts += 1
     return None
 
@@ -53,6 +53,7 @@ elif choice == "Store Data":
             encrypted_text = encrypt_data(user_data, passkey)
             stored_data[encrypted_text] = {"encrypted_text": encrypted_text, "passkey": hashed_passkey}
             st.success("✅ Data stored securely!")
+            st.code(encrypted_text, language="text")
         else:
             st.error("⚠️ Both fields are required!")
 
@@ -69,7 +70,6 @@ elif choice == "Retrieve Data":
                 st.success(f"✅ Decrypted Data: {decrypted_text}")
             else:
                 st.error(f"❌ Incorrect passkey! Attempts remaining: {3 - failed_attempts}")
-
                 if failed_attempts >= 3:
                     st.warning("🔒 Too many failed attempts! Redirecting to Login Page.")
                     st.experimental_rerun()
@@ -81,9 +81,8 @@ elif choice == "Login":
     login_pass = st.text_input("Enter Master Password:", type="password")
 
     if st.button("Login"):
-        if login_pass == "admin123":  # Hardcoded for demo, replace with proper auth
-            global failed_attempts
-            failed_attempts = 0
+        if login_pass == "admin123":  # Replace with secure auth if needed
+            failed_attempts = 0  # ✅ No need for global here
             st.success("✅ Reauthorized successfully! Redirecting to Retrieve Data...")
             st.experimental_rerun()
         else:
